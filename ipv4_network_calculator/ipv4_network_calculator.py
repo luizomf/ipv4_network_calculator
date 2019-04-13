@@ -1,55 +1,58 @@
 import re
 
-class Ipv4NetworkCalculator():
+class Ipv4NetworkCalculator:
     """Obtém todos os dados de uma rede IPv4"""
     def __init__(self, ip: str = '', prefixo: int = 0, mascara: str = ''):
-        """
-        Parameters
-        ----------
-        ip : str
-            um IP na versão 4. Ex.: 192.168.0.1.
-            O IP também pode vir com prefixo (192.168.0.1/24), nesse caso
-            não é necessário enviar o parâmetro do prefixo.
-        prefixo : int
-            o prefixo da rede. Ex.: 24, 8, 30 (não necessário se enviar a máscara
-            ou o prefixo via IP)
-        mascara : str
-            a mascara de sub-rede. Ex.: 255.255.255.0 (não necessário se enviar o prefixo
-            via IP ou parâmetro)
-        """
-        self.__ip: str = ip
-        self.__prefixo: int = prefixo
-        self.__mascara: str = mascara
+        """Configura os parâmetros (Opcional)"""
+        if ip:
+            self.__reset()
+            self.ip: str = ip
+        else:
+            self.ip: str = ''
 
-        self.__rede: str = ''
-        self.__broadcast: str = ''
-        self.__numero_ips: int = 0
+        if prefixo:
+            self.prefixo: int = prefixo
+        else:
+            self.prefixo: int = 0
 
-        # Executa tudo
-        if self.__ip:
+        if mascara:
+            self.mascara: str = mascara
+        else:
+            self.mascara: str = ''
+
+        self.rede: str = ''
+        self.broadcast: str = ''
+        self.numero_ips: int = 0
+
+        # Executa tudo caso o IP tenha sido enviado
+        if self.ip:
             self.run()
 
     def __reset(self):
-        self.__mascara: str = ''
-        self.__prefixo: int = 0
-        self.__broadcast: str = ''
-        self.__rede: str = ''
-        self.__numero_ips: int = 0
+        "Nos casos de reutilização, zera os valores dos atributos e propriedades"
+        self.ip: str = ''
+        self.mascara: str = ''
+        self.prefixo: int = 0
+        self.broadcast: str = ''
+        self.rede: str = ''
+        self.numero_ips: int = 0
 
     def run(self):
-        if self.__ip == '' or not self.__ip:
+        """Executa tudo"""
+
+        # Sem IP, sem cálculo
+        if self.ip == '' or not self.ip:
             raise ValueError("IP não enviado.")
 
-        self.__ip_tem_prefixo()
+        # Extrai o prefixo do IP caso IP tenha o formato IP/CIDR
+        self.__set_prefixo_do_ip()
 
-        if not self.__is_ip():
-            raise ValueError("IP inválido.")
-
-        if not self.__prefixo and not self.__mascara:
+        if not self.prefixo and not self.mascara:
             raise ValueError("Ou o prefixo ou a máscara devem ser enviados.")
 
-        if self.__mascara:
-            self.__mascara_bin = self.__ip_decimal_para_binario(ip=self.__mascara)
+        # Caso a máscara tenha sido enviada, extrai o prefixo da máscara
+        if self.mascara:
+            self.__mascara_bin = self.__ip_decimal_para_binario(ip=self.mascara)
             self.__set_prefixo_da_mascara()
 
         self.__set_numero_ips()
@@ -57,24 +60,24 @@ class Ipv4NetworkCalculator():
         self.__set_mascara_do_prefixo()
 
     def __set_mascara_do_prefixo(self):
-        """Configura O IP da máscara de sub-rede"""
+        """Configura O IP da máscara usando o prefixo."""
         mascara_bin: str = ''
 
         # Liga os bits da máscara até o tamanho do prefixo
         # Desliga os restantes
         for i in range(32):
-            if i < int(self.__prefixo):
+            if i < int(self.prefixo):
                 mascara_bin += '1'
             else:
                 mascara_bin += '0'
 
+        # Converte a máscara para decimal
         mascara_dec: str = self.__ip_binario_para_decimal(mascara_bin)
-
-        self.__mascara: str = mascara_dec
+        self.mascara: str = mascara_dec
 
     def __set_rede_broadcast(self):
         """Configura rede e broadcast"""
-        ip_bin: str = self.__ip_decimal_para_binario(self.__ip)
+        ip_bin: str = self.__ip_decimal_para_binario(self.ip)
         ip_bin: str = ip_bin.replace('.', '')
 
         # Seta as variáveis para receber os bits
@@ -87,20 +90,20 @@ class Ipv4NetworkCalculator():
         # bits do IP.
         # Os bits finais são desligados para rede e ligados para broadcast
         for conta, bit in enumerate(ip_bin):
-            if conta < int(self.__prefixo):
+            if conta < int(self.prefixo):
                 rede += str(bit)
                 broadcast += str(bit)
             else:
                 rede += '0'
                 broadcast += '1'
 
-        self.__rede: str = self.__ip_binario_para_decimal(rede)
-        self.__broadcast: str = self.__ip_binario_para_decimal(broadcast)
+        self.rede: str = self.__ip_binario_para_decimal(rede)
+        self.broadcast: str = self.__ip_binario_para_decimal(broadcast)
 
     def __set_numero_ips(self):
         """Configura o número de hosts para a rede"""
-        host_bits: int = 32-int(self.__prefixo)
-        self.__numero_ips: int = pow(2, host_bits)
+        host_bits: int = 32-int(self.prefixo)
+        self.numero_ips: int = pow(2, host_bits)
 
     def __set_prefixo_da_mascara(self):
         """Configura o prefixo baseado nos bits ligados do
@@ -112,21 +115,10 @@ class Ipv4NetworkCalculator():
             if bit == '1':
                 conta += 1
 
-        self.__prefixo: int = conta
+        self.prefixo: int = conta
 
     def __ip_binario_para_decimal(self, ip: str = '') -> str:
-        """Converte um IP binário para decimal
-
-        Parameters
-        ----------
-        ip : str
-            O IP em números binários
-
-        Returns
-        -------
-        str
-            o IP em decimal
-        """
+        """Converte um IP binário para decimal"""
         novo_ip: str = str(int(ip[0:8], 2)) + '.'
         novo_ip += str(int(ip[8:16], 2)) + '.'
         novo_ip += str(int(ip[16:24], 2)) + '.'
@@ -135,20 +127,9 @@ class Ipv4NetworkCalculator():
         return novo_ip
 
     def __ip_decimal_para_binario(self, ip: str = '') -> str:
-        """Converte um IP decimal para binário
-
-        Parameters
-        ----------
-        ip : str
-            O IP em decimal
-
-        Returns
-        -------
-        str
-            o IP em binário
-        """
+        """Converte um IP decimal para binário"""
         if not ip:
-            ip: str = self.__ip
+            ip: str = self.ip
 
         # Divide o IP em 4 blocos
         bloco_ip: list = ip.split('.')
@@ -165,87 +146,88 @@ class Ipv4NetworkCalculator():
         ip_com_pontos: str = '.'.join(ip_bin)
         return ip_com_pontos
 
-    def __ip_tem_prefixo(self) -> bool:
-        """Verifica se o IP tem prefixo.
-        Se tiver, configura o ip e prefixo.
-
-        Returns
-        -------
-        Bool
-            Se o IP tiver prefixo, True. False caso não tenha.
-        """
+    def __set_prefixo_do_ip(self) -> bool:
+        """Verifica se o IP tem prefixo."""
         ip_prefixo_regexp = re.compile('^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}/[0-9]{1,2}$')
 
-        if not ip_prefixo_regexp.search(self.__ip):
+        if not ip_prefixo_regexp.search(self.ip):
             return False
 
-        divide_ip = self.__ip.split('/')
-        self.__ip = divide_ip[0]
-        self.__prefixo = divide_ip[1]
+        divide_ip = self.ip.split('/')
+        self.ip = divide_ip[0]
+        self.prefixo = divide_ip[1]
 
         return True
 
-    def __is_ip(self) -> bool:
-        """Verifica se o IP tem prefixo.
-        Se tiver, configura o ip e prefixo.
+    def __is_ip(self, ip) -> bool:
+        """Verifica se o IP é válido."""
+        if not ip:
+            return False
 
-        Returns
-        -------
-        bool
-            True se o IP estiver correto, False caso contrário.
-        """
-        ip_regexp = re.compile('^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}$')
+        # Aceita IP ou IP/CIDR (Ex.: 192.168.0.1 ou 192.168.0.1/24)
+        ip_regexp = re.compile('^([0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3})(/[0-9]{1,2})?$')
 
-        if ip_regexp.search(self.__ip):
+        if ip_regexp.search(ip):
             return True
         return False
 
     ## GETTERS
-    def get_ip(self) -> str:
+    @property
+    def ip(self) -> str:
         return str(self.__ip)
 
-    def get_prefixo(self) -> int:
+    @property
+    def prefixo(self) -> int:
         return int(self.__prefixo)
 
-    def get_mascara(self) -> str:
+    @property
+    def mascara(self) -> str:
         return str(self.__mascara)
 
-    def get_rede(self) -> str:
-        return str(self.__rede)
-
-    def get_broadcast(self) -> str:
-        return str(self.__broadcast)
-
-    def get_numero_ips(self) -> int:
-        return int(self.__numero_ips)
-
     def get_all(self):
-        """Retorna tudo que foi configurado."""
-        return {
-            'ip': self.get_ip(),
-            'prefixo': self.get_prefixo(),
-            'mascara': self.get_mascara(),
-            'rede': self.get_rede(),
-            'broadcast': self.get_broadcast(),
-            'numero_ips': self.get_numero_ips(),
+        """Retorna tudo que foi configurado, caso necessário."""
+        all: dict = {
+            'ip': self.ip,
+            'prefixo': self.prefixo,
+            'mascara': self.mascara,
+            'rede': self.rede,
+            'broadcast': self.broadcast,
+            'numero_ips': self.numero_ips,
         }
 
+        return all
+
     # SETTERS
-    def set_ip(self, ip: str = ''):
-        self.__ip: str = str(ip)
-        self.__reset()
+    @ip.setter
+    def ip(self, ip: str = ''):
+        if ip:
+            if not self.__is_ip(ip):
+                raise ValueError("IP inválido")
 
-    def set_prefixo(self, prefixo: int = 0):
-        if not self.__ip:
-            raise ("Setar IP primeiro.")
+            self.__reset()
+            self.__ip: str = str(ip)
+        else:
+            self.__ip = ''
 
-        self.__reset()
-        self.__prefixo: int = int(prefixo)
+    @prefixo.setter
+    def prefixo(self, prefixo: int = 0):
+        if prefixo:
+            self.__prefixo: int = int(prefixo)
 
-    def set_mascara(self, mascara: str = ''):
-        if not self.__ip:
-            raise ("Setar IP primeiro.")
+            if not self.ip:
+                raise ValueError("Setar IP primeiro.")
+        else:
+            self.__prefixo = 0
 
-        self.__reset()
-        self.__mascara: str = str(mascara)
+    @mascara.setter
+    def mascara(self, mascara: str = ''):
+        if mascara:
+            if not self.__is_ip(mascara):
+                raise ValueError("Máscara inválida")
 
+            self.__mascara: str = str(mascara)
+
+            if not self.ip:
+                raise ValueError("Setar IP primeiro.")
+        else:
+            self.__mascara = ''
