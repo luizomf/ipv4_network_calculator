@@ -75,7 +75,7 @@ if __name__ == '__main__':
     print("\n#### EXEMPLO 5.4 (Erro) ####")
 
     try:
-        exemplo5.run() # Precisa executar run (como sempre)
+        exemplo5.run() # Precisa executar run
         exemplo5: dict = exemplo5.get_all()
         print(exemplo5)
     except ValueError as error:
