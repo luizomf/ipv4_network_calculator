@@ -1,7 +1,7 @@
 from ipv4_network_calculator.ipv4_network_calculator import Ipv4NetworkCalculator
 
 if __name__ == '__main__':
-    ### EXEMPLO 1 (Enviando IP com a máscara) ###
+    ### EXEMPLO 1 (Enviando IP com a máscara)
     exemplo1 = Ipv4NetworkCalculator(ip='192.168.60.127', mascara='255.255.255.0')
     exemplo1_tudo: dict = exemplo1.get_all()
 
