@@ -3,7 +3,15 @@ import re
 class Ipv4NetworkCalculator:
     """Obtém todos os dados de uma rede IPv4"""
     def __init__(self, ip: str = '', prefixo: int = 0, mascara: str = ''):
-        """Configura os parâmetros (Opcional)"""
+        """Configura os parâmetros e executa caso IP tenha sido enviado
+
+        :param ip: o ip (pode conter barra e prefixo, como /24)
+        :type ip: str
+        :param prefixo: o prefixo pode ser enviado separadamente (opcional)
+        :type prefixo: int
+        :param mascara: o ip da máscara de sub-rede (opcional)
+        :type mascara: str
+        """
         if ip:
             self.__reset()
             self.ip: str = ip
