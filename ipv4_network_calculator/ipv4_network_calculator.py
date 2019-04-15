@@ -169,7 +169,7 @@ class Ipv4NetworkCalculator:
             ip_bin.append(binario)
 
         # TODO: retornar sem o ponto
-        # ip_com_pontos: str = '.'.join(ip_bin)
+        ip_com_pontos: str = ''.join(ip_bin)
         return ip_com_pontos
 
     def __set_prefixo_do_ip(self) -> bool:
