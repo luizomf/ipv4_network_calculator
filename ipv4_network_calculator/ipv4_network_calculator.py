@@ -37,7 +37,7 @@ class Ipv4NetworkCalculator:
             self.run()
 
     def __reset(self):
-        "Nos casos de reutilização, zera os valores dos atributos e propriedades"
+        """Nos casos de reutilização, zera os valores dos atributos e propriedades"""
         self.ip: str = ''
         self.mascara: str = ''
         self.prefixo: int = 0
@@ -46,7 +46,13 @@ class Ipv4NetworkCalculator:
         self.numero_ips: int = 0
 
     def run(self):
-        """Executa tudo"""
+        """Realiza os cálculos
+
+        Se o atributo ip e/ou (máscara ou prefixo) não forem enviados
+        ao instanciar a classe para reutilização da instancia, será
+        necessário atribuir os valores de ip, prefixo ou máscara
+        posteriormente. Nesses casos é necessário executar este
+        método para realização do cálculo."""
 
         # Sem IP, sem cálculo
         if self.ip == '' or not self.ip:
@@ -126,7 +132,13 @@ class Ipv4NetworkCalculator:
         self.prefixo: int = conta
 
     def __ip_binario_para_decimal(self, ip: str = '') -> str:
-        """Converte um IP binário para decimal"""
+        """Converte um IP binário para decimal
+
+        :param ip: o número do IP em binário
+        :type ip: str
+        :return: O IP em decimal.
+        :rtype: str
+        """
         novo_ip: str = str(int(ip[0:8], 2)) + '.'
         novo_ip += str(int(ip[8:16], 2)) + '.'
         novo_ip += str(int(ip[16:24], 2)) + '.'
@@ -135,7 +147,13 @@ class Ipv4NetworkCalculator:
         return novo_ip
 
     def __ip_decimal_para_binario(self, ip: str = '') -> str:
-        """Converte um IP decimal para binário"""
+        """Converte um IP decimal para binário
+
+        :param ip: O IP em decimal
+        :type ip: str
+        :return: O IP em binário
+        :rtype: str
+        """
         if not ip:
             ip: str = self.ip
 
@@ -151,11 +169,15 @@ class Ipv4NetworkCalculator:
             ip_bin.append(binario)
 
         # TODO: retornar sem o ponto
-        ip_com_pontos: str = '.'.join(ip_bin)
+        # ip_com_pontos: str = '.'.join(ip_bin)
         return ip_com_pontos
 
     def __set_prefixo_do_ip(self) -> bool:
-        """Verifica se o IP tem prefixo."""
+        """Verifica se o IP tem prefixo.
+
+        :return: True se o IP tiver prefixo, False caso contrário.
+        :rtype: bool
+        """
         ip_prefixo_regexp = re.compile('^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}/[0-9]{1,2}$')
 
         if not ip_prefixo_regexp.search(self.ip):
@@ -168,7 +190,13 @@ class Ipv4NetworkCalculator:
         return True
 
     def __is_ip(self, ip) -> bool:
-        """Verifica se o IP é válido."""
+        """Verifica se o IP é válido.
+
+        :param ip: O IP em decimal
+        :type ip: str
+        :return: True se o IP estiver correto, False caso contrário.
+        :rtype: bool
+        """
         if not ip:
             return False
 
@@ -193,7 +221,11 @@ class Ipv4NetworkCalculator:
         return str(self.__mascara)
 
     def get_all(self):
-        """Retorna tudo que foi configurado, caso necessário."""
+        """ Retorna tudo que foi configurado, caso necessário.
+
+        :return: um dicionário com os dados calculados.
+        :rtype: dict
+        """
         all: dict = {
             'ip': self.ip,
             'prefixo': self.prefixo,
