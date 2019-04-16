@@ -85,6 +85,8 @@ class Ipv4NetworkCalculator:
             else:
                 mascara_bin += '0'
 
+        self.mascara_bin = self.__binario_adiciona_pontos(mascara_bin)
+
         # Converte a máscara para decimal
         mascara_dec: str = self.__ip_binario_para_decimal(mascara_bin)
         self.mascara: str = mascara_dec
@@ -95,6 +97,7 @@ class Ipv4NetworkCalculator:
         ip_bin: str = ip_bin.replace('.', '')
 
         # Seta as variáveis para receber os bits
+        ip: str = ''
         rede: str = ''
         broadcast: str = ''
 
@@ -104,6 +107,7 @@ class Ipv4NetworkCalculator:
         # bits do IP.
         # Os bits finais são desligados para rede e ligados para broadcast
         for conta, bit in enumerate(ip_bin):
+            ip += str(bit)
             if conta < int(self.prefixo):
                 rede += str(bit)
                 broadcast += str(bit)
@@ -111,8 +115,22 @@ class Ipv4NetworkCalculator:
                 rede += '0'
                 broadcast += '1'
 
+        self.ip_bin = self.__binario_adiciona_pontos(ip)
+        self.rede_bin = self.__binario_adiciona_pontos(rede)
+        self.broadcast_bin = self.__binario_adiciona_pontos(broadcast)
+
         self.rede: str = self.__ip_binario_para_decimal(rede)
         self.broadcast: str = self.__ip_binario_para_decimal(broadcast)
+
+    def __binario_adiciona_pontos(self, b: str) -> str:
+        """Adiciona pontos aos octetos
+
+        :param b: IP em binário sem pontos
+        :type b: str
+        :return: IP em binário com pontos
+        :rtype: str
+        """
+        return '{}.{}.{}.{}'.format(b[0:8], b[8:16], b[16:24], b[24:32])
 
     def __set_numero_ips(self):
         """Configura o número de hosts para a rede"""
@@ -168,9 +186,8 @@ class Ipv4NetworkCalculator:
             binario: bin = binario[2:].zfill(8)
             ip_bin.append(binario)
 
-        # TODO: retornar sem o ponto
-        ip_com_pontos: str = ''.join(ip_bin)
-        return ip_com_pontos
+        ip_bin: str = '.'.join(ip_bin)
+        return ip_bin
 
     def __set_prefixo_do_ip(self) -> bool:
         """Verifica se o IP tem prefixo.
@@ -233,6 +250,21 @@ class Ipv4NetworkCalculator:
             'rede': self.rede,
             'broadcast': self.broadcast,
             'numero_ips': self.numero_ips,
+        }
+
+        return all
+
+    def get_all_bin(self):
+        """ Retorna tudo que foi configurado em binário.
+
+        :return: um dicionário com os dados calculados.
+        :rtype: dict
+        """
+        all: dict = {
+            'ip': self.ip_bin,
+            'mascara': self.mascara_bin,
+            'rede': self.rede_bin,
+            'broadcast': self.broadcast_bin,
         }
 
         return all

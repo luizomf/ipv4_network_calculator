@@ -80,3 +80,11 @@ if __name__ == '__main__':
         print(exemplo5)
     except ValueError as error:
         print(error)
+
+    ### EXEMPLO 6 (Retornando tudo em binário)
+    exemplo6 = Ipv4NetworkCalculator(ip='192.168.25.127', prefixo=24)
+    exemplo6_tudo_bin: dict = exemplo6.get_all_bin()
+    exemplo6_tudo_dec: dict = exemplo6.get_all()
+    print("\n#### EXEMPLO 6 ####")
+    print(exemplo6_tudo_bin)
+    print(exemplo6_tudo_dec)
