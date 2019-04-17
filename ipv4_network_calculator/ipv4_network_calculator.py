@@ -1,7 +1,9 @@
 import re
 
+
 class Ipv4NetworkCalculator:
     """Obtém todos os dados de uma rede IPv4"""
+
     def __init__(self, ip: str = '', prefixo: int = 0, mascara: str = ''):
         """Configura os parâmetros e executa caso IP tenha sido enviado
 
@@ -37,7 +39,8 @@ class Ipv4NetworkCalculator:
             self.run()
 
     def _reset(self):
-        """Nos casos de reutilização, zera os valores dos atributos e propriedades"""
+        """Nos casos de reutilização, zera os valores dos
+        atributos e propriedades"""
         self._ip: str = ''
         self._mascara: str = ''
         self._prefixo: int = 0
@@ -137,7 +140,7 @@ class Ipv4NetworkCalculator:
 
     def _set_numero_ips(self):
         """Configura o número de hosts para a rede"""
-        host_bits: int = 32-int(self.prefixo)
+        host_bits: int = 32 - int(self.prefixo)
         self.numero_ips: int = pow(2, host_bits)
 
     def _set_prefixo_da_mascara(self):
@@ -198,7 +201,9 @@ class Ipv4NetworkCalculator:
         :return: True se o IP tiver prefixo, False caso contrário.
         :rtype: bool
         """
-        ip_prefixo_regexp = re.compile('^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}/[0-9]{1,2}$')
+        ip_prefixo_regexp = re.compile(
+            '^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}/[0-9]{1,2}$'
+        )
 
         if not ip_prefixo_regexp.search(self.ip):
             return False
@@ -221,13 +226,15 @@ class Ipv4NetworkCalculator:
             return False
 
         # Aceita IP ou IP/CIDR (Ex.: 192.168.0.1 ou 192.168.0.1/24)
-        ip_regexp = re.compile('^([0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3})(/[0-9]{1,2})?$')
+        ip_regexp = re.compile(
+            '^([0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3})(/[0-9]{1,2})?$'
+        )
 
         if ip_regexp.search(ip):
             return True
         return False
 
-    ## GETTERS
+    # GETTERS
     @property
     def ip(self) -> str:
         return str(self._ip)
