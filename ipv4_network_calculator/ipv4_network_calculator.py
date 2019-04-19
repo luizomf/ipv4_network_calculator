@@ -1,4 +1,5 @@
 import re
+from typing import Union
 
 
 class Ipv4NetworkCalculator:
@@ -235,6 +236,17 @@ class Ipv4NetworkCalculator:
             return True
         return False
 
+    def _check_property(self, property: Union[str, int]):
+        """Verifica se existe o valor de uma propriedade
+
+        :param property: qualquer propriedade da classe
+        :type property: Union[str, int]
+        """
+        if not property:
+            raise ValueError("Valor usado incorretamente. "
+                             "Envie IP, máscara ou prefixo e "
+                             "execute run().")
+
     # GETTERS
     @property
     def ip(self) -> str:
@@ -251,30 +263,37 @@ class Ipv4NetworkCalculator:
     # Read only
     @property
     def rede(self) -> str:
+        self._check_property(self._rede)
         return str(self._rede)
 
     @property
     def broadcast(self) -> str:
+        self._check_property(self._broadcast)
         return str(self._broadcast)
 
     @property
     def numero_ips(self) -> str:
+        self._check_property(self._numero_ips)
         return str(self._numero_ips)
 
     @property
     def ip_bin(self) -> str:
+        self._check_property(self._ip_bin)
         return str(self._ip_bin)
 
     @property
     def mascara_bin(self) -> str:
+        self._check_property(self._mascara_bin)
         return str(self._mascara_bin)
 
     @property
     def rede_bin(self) -> str:
+        self._check_property(self._rede_bin)
         return str(self._rede_bin)
 
     @property
     def broadcast_bin(self) -> str:
+        self._check_property(self._broadcast_bin)
         return str(self._broadcast)
 
     def get_all(self):
