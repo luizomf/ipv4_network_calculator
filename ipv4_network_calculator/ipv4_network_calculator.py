@@ -4,6 +4,10 @@ import re
 class Ipv4NetworkCalculator:
     """Obtém todos os dados de uma rede IPv4"""
 
+    __slots__ = ('_ip', '_mascara', '_prefixo', '_broadcast',
+                 '_numero_ips', '_rede', '_ip_bin', '_mascara_bin',
+                 '_rede_bin', '_broadcast_bin')
+
     def __init__(self, ip: str = '', prefixo: int = 0, mascara: str = ''):
         """Configura os parâmetros e executa caso IP tenha sido enviado
 
@@ -21,18 +25,18 @@ class Ipv4NetworkCalculator:
             self.ip: str = ''
 
         if prefixo:
-            self.prefixo: int = prefixo
+            self._prefixo: int = prefixo
         else:
-            self.prefixo: int = 0
+            self._prefixo: int = 0
 
         if mascara:
-            self.mascara: str = mascara
+            self._mascara: str = mascara
         else:
-            self.mascara: str = ''
+            self._mascara: str = ''
 
-        self.rede: str = ''
-        self.broadcast: str = ''
-        self.numero_ips: int = 0
+        self._rede: str = ''
+        self._broadcast: str = ''
+        self._numero_ips: int = 0
 
         # Executa tudo caso o IP tenha sido enviado
         if self.ip:
@@ -44,12 +48,9 @@ class Ipv4NetworkCalculator:
         self._ip: str = ''
         self._mascara: str = ''
         self._prefixo: int = 0
-        self.ip: str = ''
-        self.mascara: str = ''
-        self.prefixo: int = 0
-        self.broadcast: str = ''
-        self.rede: str = ''
-        self.numero_ips: int = 0
+        self._broadcast: str = ''
+        self._rede: str = ''
+        self._numero_ips: int = 0
 
     def run(self):
         """Realiza os cálculos
@@ -67,12 +68,12 @@ class Ipv4NetworkCalculator:
         # Extrai o prefixo do IP caso IP tenha o formato IP/CIDR
         self._set_prefixo_do_ip()
 
-        if not self.prefixo and not self.mascara:
+        if not self._prefixo and not self._mascara:
             raise ValueError("Ou o prefixo ou a máscara devem ser enviados.")
 
         # Caso a máscara tenha sido enviada, extrai o prefixo da máscara
-        if self.mascara:
-            self._mascara_bin = self._ip_decimal_para_binario(ip=self.mascara)
+        if self._mascara:
+            self._mascara_bin = self._ip_decimal_para_binario(ip=self._mascara)
             self._set_prefixo_da_mascara()
 
         self._set_numero_ips()
@@ -86,16 +87,16 @@ class Ipv4NetworkCalculator:
         # Liga os bits da máscara até o tamanho do prefixo
         # Desliga os restantes
         for i in range(32):
-            if i < int(self.prefixo):
+            if i < int(self._prefixo):
                 mascara_bin += '1'
             else:
                 mascara_bin += '0'
 
-        self.mascara_bin = self._binario_adiciona_pontos(mascara_bin)
+        self._mascara_bin = self._binario_adiciona_pontos(mascara_bin)
 
         # Converte a máscara para decimal
         mascara_dec: str = self._ip_binario_para_decimal(mascara_bin)
-        self.mascara: str = mascara_dec
+        self._mascara: str = mascara_dec
 
     def _set_rede_broadcast(self):
         """Configura rede e broadcast"""
@@ -114,19 +115,19 @@ class Ipv4NetworkCalculator:
         # Os bits finais são desligados para rede e ligados para broadcast
         for conta, bit in enumerate(ip_bin):
             ip += str(bit)
-            if conta < int(self.prefixo):
+            if conta < int(self._prefixo):
                 rede += str(bit)
                 broadcast += str(bit)
             else:
                 rede += '0'
                 broadcast += '1'
 
-        self.ip_bin = self._binario_adiciona_pontos(ip)
-        self.rede_bin = self._binario_adiciona_pontos(rede)
-        self.broadcast_bin = self._binario_adiciona_pontos(broadcast)
+        self._ip_bin = self._binario_adiciona_pontos(ip)
+        self._rede_bin = self._binario_adiciona_pontos(rede)
+        self._broadcast_bin = self._binario_adiciona_pontos(broadcast)
 
-        self.rede: str = self._ip_binario_para_decimal(rede)
-        self.broadcast: str = self._ip_binario_para_decimal(broadcast)
+        self._rede: str = self._ip_binario_para_decimal(rede)
+        self._broadcast: str = self._ip_binario_para_decimal(broadcast)
 
     def _binario_adiciona_pontos(self, b: str) -> str:
         """Adiciona pontos aos octetos
@@ -140,8 +141,8 @@ class Ipv4NetworkCalculator:
 
     def _set_numero_ips(self):
         """Configura o número de hosts para a rede"""
-        host_bits: int = 32 - int(self.prefixo)
-        self.numero_ips: int = pow(2, host_bits)
+        host_bits: int = 32 - int(self._prefixo)
+        self._numero_ips: int = pow(2, host_bits)
 
     def _set_prefixo_da_mascara(self):
         """Configura o prefixo baseado nos bits ligados do
@@ -153,7 +154,7 @@ class Ipv4NetworkCalculator:
             if bit == '1':
                 conta += 1
 
-        self.prefixo: int = conta
+        self._prefixo: int = conta
 
     def _ip_binario_para_decimal(self, ip: str = '') -> str:
         """Converte um IP binário para decimal
@@ -210,7 +211,7 @@ class Ipv4NetworkCalculator:
 
         divide_ip = self.ip.split('/')
         self.ip = divide_ip[0]
-        self.prefixo = divide_ip[1]
+        self._prefixo = divide_ip[1]
 
         return True
 
@@ -247,6 +248,35 @@ class Ipv4NetworkCalculator:
     def mascara(self) -> str:
         return str(self._mascara)
 
+    # Read only
+    @property
+    def rede(self) -> str:
+        return str(self._rede)
+
+    @property
+    def broadcast(self) -> str:
+        return str(self._broadcast)
+
+    @property
+    def numero_ips(self) -> str:
+        return str(self._numero_ips)
+
+    @property
+    def ip_bin(self) -> str:
+        return str(self._ip_bin)
+
+    @property
+    def mascara_bin(self) -> str:
+        return str(self._mascara_bin)
+
+    @property
+    def rede_bin(self) -> str:
+        return str(self._rede_bin)
+
+    @property
+    def broadcast_bin(self) -> str:
+        return str(self._broadcast)
+
     def get_all(self):
         """ Retorna tudo que foi configurado, caso necessário.
 
@@ -255,11 +285,11 @@ class Ipv4NetworkCalculator:
         """
         all: dict = {
             'ip': self.ip,
-            'prefixo': self.prefixo,
-            'mascara': self.mascara,
-            'rede': self.rede,
-            'broadcast': self.broadcast,
-            'numero_ips': self.numero_ips,
+            'prefixo': self._prefixo,
+            'mascara': self._mascara,
+            'rede': self._rede,
+            'broadcast': self._broadcast,
+            'numero_ips': self._numero_ips,
         }
 
         return all
@@ -271,10 +301,10 @@ class Ipv4NetworkCalculator:
         :rtype: dict
         """
         all: dict = {
-            'ip': self.ip_bin,
-            'mascara': self.mascara_bin,
-            'rede': self.rede_bin,
-            'broadcast': self.broadcast_bin,
+            'ip': self._ip_bin,
+            'mascara': self._mascara_bin,
+            'rede': self._rede_bin,
+            'broadcast': self._broadcast_bin,
         }
 
         return all
