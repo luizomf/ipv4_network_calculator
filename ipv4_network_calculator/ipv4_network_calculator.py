@@ -83,20 +83,13 @@ class Ipv4NetworkCalculator:
 
     def _set_mascara_do_prefixo(self):
         """Configura O IP da máscara usando o prefixo."""
-        mascara_bin: str = ''
+        mascara_bits = self.prefixo * str('1')
+        host_bits = (32 - self.prefixo) * str('0')
 
-        # Liga os bits da máscara até o tamanho do prefixo
-        # Desliga os restantes
-        for i in range(32):
-            if i < int(self._prefixo):
-                mascara_bin += '1'
-            else:
-                mascara_bin += '0'
-
-        self._mascara_bin = self._binario_adiciona_pontos(mascara_bin)
+        self._mascara_bin = mascara_bits + host_bits
 
         # Converte a máscara para decimal
-        mascara_dec: str = self._ip_binario_para_decimal(mascara_bin)
+        mascara_dec: str = self._ip_binario_para_decimal(self._mascara_bin)
         self._mascara: str = mascara_dec
 
     def _set_rede_broadcast(self):
@@ -104,26 +97,12 @@ class Ipv4NetworkCalculator:
         ip_bin: str = self._ip_decimal_para_binario(self.ip)
         ip_bin: str = ip_bin.replace('.', '')
 
-        # Seta as variáveis para receber os bits
-        ip: str = ''
-        rede: str = ''
-        broadcast: str = ''
+        ip_bits = ip_bin[:self._prefixo]
+        host_bits = 32 - self.prefixo
+        rede = ip_bits + ( str('0') * host_bits )
+        broadcast = ip_bits + ( str('1') * host_bits )
 
-        # Passa por cada bit do IP
-        # Até o tamanho do prefixo,
-        # Rede e broadcast tem os mesmos
-        # bits do IP.
-        # Os bits finais são desligados para rede e ligados para broadcast
-        for conta, bit in enumerate(ip_bin):
-            ip += str(bit)
-            if conta < int(self._prefixo):
-                rede += str(bit)
-                broadcast += str(bit)
-            else:
-                rede += '0'
-                broadcast += '1'
-
-        self._ip_bin = self._binario_adiciona_pontos(ip)
+        self._ip_bin = self._binario_adiciona_pontos(ip_bin)
         self._rede_bin = self._binario_adiciona_pontos(rede)
         self._broadcast_bin = self._binario_adiciona_pontos(broadcast)
 
@@ -149,11 +128,7 @@ class Ipv4NetworkCalculator:
         """Configura o prefixo baseado nos bits ligados do
         IP da máscara"""
         mascara_bin: str = self._mascara_bin.replace('.', '')
-        conta: int = 0
-
-        for bit in mascara_bin:
-            if bit == '1':
-                conta += 1
+        conta: int = int(mascara_bin.count('1'))
 
         self._prefixo: int = conta
 
@@ -212,7 +187,7 @@ class Ipv4NetworkCalculator:
 
         divide_ip = self.ip.split('/')
         self.ip = divide_ip[0]
-        self._prefixo = divide_ip[1]
+        self._prefixo = int(divide_ip[1])
 
         return True
 
