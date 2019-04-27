@@ -86,7 +86,8 @@ class Ipv4NetworkCalculator:
         mascara_bits = self.prefixo * str('1')
         host_bits = (32 - self.prefixo) * str('0')
 
-        self._mascara_bin = mascara_bits + host_bits
+        self._mascara_bin = self._binario_adiciona_pontos(
+            mascara_bits + host_bits)
 
         # Converte a máscara para decimal
         mascara_dec: str = self._ip_binario_para_decimal(self._mascara_bin)
@@ -117,7 +118,8 @@ class Ipv4NetworkCalculator:
         :return: IP em binário com pontos
         :rtype: str
         """
-        return '{}.{}.{}.{}'.format(b[0:8], b[8:16], b[16:24], b[24:32])
+        b: str = re.sub('[^0-1]', '', b)
+        return f'{b[0:8]}.{b[8:16]}.{b[16:24]}.{b[24:32]}'
 
     def _set_numero_ips(self):
         """Configura o número de hosts para a rede"""
@@ -140,6 +142,8 @@ class Ipv4NetworkCalculator:
         :return: O IP em decimal.
         :rtype: str
         """
+        ip: str = re.sub('[^0-9]', '', ip)
+
         novo_ip: str = str(int(ip[0:8], 2)) + '.'
         novo_ip += str(int(ip[8:16], 2)) + '.'
         novo_ip += str(int(ip[16:24], 2)) + '.'
