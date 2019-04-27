@@ -24,7 +24,7 @@ if __name__ == '__main__':
     print('Número de IPs da rede:', numero_ips)
 
     # EXEMPLO 2 (Enviando IP com prefixo)
-    exemplo2 = Ipv4NetworkCalculator(ip='10.50.60.224/26')
+    exemplo2 = Ipv4NetworkCalculator(ip='10.50.60.224/30')
     exemplo2_tudo: dict = exemplo2.get_all()
     print("\n#### EXEMPLO 2 ####")
     print(exemplo2_tudo)

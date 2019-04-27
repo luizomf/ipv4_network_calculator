@@ -26,14 +26,14 @@ class Ipv4NetworkCalculator:
             self.ip: str = ''
 
         if prefixo:
-            self._prefixo: int = prefixo
+            self.prefixo: int = prefixo
         else:
-            self._prefixo: int = 0
+            self.prefixo: int = 0
 
         if mascara:
-            self._mascara: str = mascara
+            self.mascara: str = mascara
         else:
-            self._mascara: str = ''
+            self.mascara: str = ''
 
         self._rede: str = ''
         self._broadcast: str = ''
@@ -191,7 +191,7 @@ class Ipv4NetworkCalculator:
 
         divide_ip = self.ip.split('/')
         self.ip = divide_ip[0]
-        self._prefixo = int(divide_ip[1])
+        self.prefixo = int(divide_ip[1])
 
         return True
 
@@ -206,14 +206,16 @@ class Ipv4NetworkCalculator:
         if not ip:
             return False
 
-        # Aceita IP ou IP/CIDR (Ex.: 192.168.0.1 ou 192.168.0.1/24)
-        ip_regexp = re.compile(
-            '^([0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3})(/[0-9]{1,2})?$'
-        )
+        clean_ip = re.sub('/[0-9]+', '', ip)
+        blocos = clean_ip.split('.')
 
-        if ip_regexp.search(ip):
-            return True
-        return False
+        for bloco in blocos:
+            bloco = int(bloco)
+
+            if bloco < 0 or bloco > 255:
+                return False
+
+        return True
 
     def _check_property(self, property: Union[str, int]):
         """Verifica se existe o valor de uma propriedade
@@ -322,10 +324,13 @@ class Ipv4NetworkCalculator:
     @prefixo.setter
     def prefixo(self, prefixo: int = 0):
         if prefixo:
-            self._prefixo: int = int(prefixo)
-
             if not self.ip:
                 raise ValueError("Setar IP primeiro.")
+
+            if prefixo > 32:
+                raise ValueError("Prefixo inválido")
+
+            self._prefixo: int = int(prefixo)
         else:
             self._prefixo = 0
 
@@ -335,9 +340,9 @@ class Ipv4NetworkCalculator:
             if not self._is_ip(mascara):
                 raise ValueError("Máscara inválida")
 
-            self._mascara: str = str(mascara)
-
             if not self.ip:
                 raise ValueError("Setar IP primeiro.")
+
+            self._mascara: str = str(mascara)
         else:
             self._mascara = ''
