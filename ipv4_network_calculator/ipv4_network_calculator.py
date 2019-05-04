@@ -100,8 +100,8 @@ class Ipv4NetworkCalculator:
 
         ip_bits = ip_bin[:self._prefixo]
         host_bits = 32 - self.prefixo
-        rede = ip_bits + ( str('0') * host_bits )
-        broadcast = ip_bits + ( str('1') * host_bits )
+        rede = ip_bits + (str('0') * host_bits)
+        broadcast = ip_bits + (str('1') * host_bits)
 
         self._ip_bin = self._binario_adiciona_pontos(ip_bin)
         self._rede_bin = self._binario_adiciona_pontos(rede)
